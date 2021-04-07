@@ -226,6 +226,7 @@ project.afterEvaluate {
         source(project.subprojects.stream().map({
             project(it.path).sourceSets.main.allJava
         }).collect(Collectors.toList()))
+        options.addStringOption('Xdoclint:-html')
     }
 }
 
