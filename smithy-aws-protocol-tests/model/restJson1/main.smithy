@@ -92,5 +92,10 @@ service RestJson {
 
         // checksum(s)
         HttpChecksumRequired,
+
+        // malformed request tests
+        MalformedRequestBody,
+        MalformedInteger,
+        MalformedUnion
     ]
 }
