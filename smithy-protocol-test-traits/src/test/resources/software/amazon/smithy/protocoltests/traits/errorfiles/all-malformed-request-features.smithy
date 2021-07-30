@@ -76,6 +76,28 @@ structure testProtocol {}
             headers: {"X-Foo": "baz"}
         },
         tags: ["foo", "bar"]
+    },
+    {
+        id: "parameterized",
+        documentation: "Testing...",
+        protocol: testProtocol,
+        request: {
+            body: "$foo:L",
+            headers: {"X-Foo": "baz"},
+            host: "example.com",
+            method: "POST",
+            uri: "/",
+            queryParams: ["foo=baz"]
+        },
+        response: {
+            code: 400,
+            headers: {"X-Foo": "$bar:L"}
+        },
+        tags: ["foo", "bar"],
+        testParameters: {
+            "foo" : ["a", "b", "c"],
+            "bar" : ["d", "e", "f"]
+        }
     }
 ])
 operation SayHello {

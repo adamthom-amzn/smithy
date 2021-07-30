@@ -18,11 +18,6 @@ package software.amazon.smithy.protocoltests.traits;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import software.amazon.smithy.model.node.ArrayNode;
-import software.amazon.smithy.model.node.Node;
-import software.amazon.smithy.model.node.ObjectNode;
-import software.amazon.smithy.model.node.StringNode;
-import software.amazon.smithy.model.node.ToNode;
 import software.amazon.smithy.model.shapes.ShapeId;
 import software.amazon.smithy.model.shapes.ToShapeId;
 import software.amazon.smithy.utils.ListUtils;
@@ -33,15 +28,12 @@ import software.amazon.smithy.utils.ToSmithyBuilder;
 /**
  * Defines a test case for malformed HTTP requests.
  */
-public final class HttpMalformedRequestTestCase
-        implements Tagged, ToNode, ToSmithyBuilder<HttpMalformedRequestTestCase> {
+public final class HttpMalformedRequestTestCase implements Tagged, ToSmithyBuilder<HttpMalformedRequestTestCase> {
 
-    private static final String DOCUMENTATION = "documentation";
     private static final String ID = "id";
     private static final String PROTOCOL = "protocol";
     private static final String REQUEST = "request";
     private static final String RESPONSE = "response";
-    private static final String TAGS = "tags";
 
     private final String documentation;
     private final String id;
@@ -84,33 +76,6 @@ public final class HttpMalformedRequestTestCase
         return tags;
     }
 
-    public static HttpMalformedRequestTestCase fromNode(Node node) {
-        HttpMalformedRequestTestCase.Builder builder = builder();
-        ObjectNode o = node.expectObjectNode();
-        o.getStringMember(DOCUMENTATION).map(StringNode::getValue).ifPresent(builder::documentation);
-        builder.id(o.expectStringMember(ID).getValue());
-        builder.protocol(o.expectStringMember(PROTOCOL).expectShapeId());
-        builder.request(HttpMalformedRequestDefinition.fromNode(o.expectObjectMember(REQUEST)));
-        builder.response(HttpMalformedResponseDefinition.fromNode(o.expectObjectMember(RESPONSE)));
-        o.getArrayMember(TAGS).ifPresent(tags -> {
-            builder.tags(tags.getElementsAs(StringNode::getValue));
-        });
-        return builder.build();
-    }
-
-    @Override
-    public Node toNode() {
-        return Node.objectNodeBuilder()
-                .withOptionalMember(DOCUMENTATION, getDocumentation().map(Node::from))
-                .withMember(ID, getId())
-                .withMember(PROTOCOL, getProtocol().toString())
-                .withMember(REQUEST, getRequest().toNode())
-                .withMember(RESPONSE, getResponse().toNode())
-                .withOptionalMember(TAGS,
-                        tags.isEmpty() ? Optional.empty() : Optional.of(ArrayNode.fromStrings(getTags())))
-                .build();
-    }
-
     @Override
     public Builder toBuilder() {
         Builder builder = builder()
@@ -128,7 +93,7 @@ public final class HttpMalformedRequestTestCase
     }
 
     /**
-     * Builder used to create a HttpRequestTestsTrait.
+     * Builder used to create a HttpMalformedRequestTestCase.
      */
     public static final class Builder implements SmithyBuilder<HttpMalformedRequestTestCase> {
 

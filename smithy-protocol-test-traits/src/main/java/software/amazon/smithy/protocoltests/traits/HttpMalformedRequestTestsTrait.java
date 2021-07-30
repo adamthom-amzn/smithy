@@ -30,13 +30,14 @@ import software.amazon.smithy.utils.ListUtils;
 public final class HttpMalformedRequestTestsTrait extends AbstractTrait {
     public static final ShapeId ID = ShapeId.from("smithy.test#httpMalformedRequestTests");
 
-    private final List<HttpMalformedRequestTestCase> testCases;
+    private final List<ParameterizedHttpMalformedRequestTestCase> testCases;
 
-    public HttpMalformedRequestTestsTrait(List<HttpMalformedRequestTestCase> testCases) {
+    public HttpMalformedRequestTestsTrait(List<ParameterizedHttpMalformedRequestTestCase> testCases) {
         this(SourceLocation.NONE, testCases);
     }
 
-    public HttpMalformedRequestTestsTrait(SourceLocation sourceLocation, List<HttpMalformedRequestTestCase> testCases) {
+    public HttpMalformedRequestTestsTrait(SourceLocation sourceLocation,
+                                          List<ParameterizedHttpMalformedRequestTestCase> testCases) {
         super(ID, sourceLocation);
         this.testCases = ListUtils.copyOf(testCases);
     }
@@ -49,17 +50,30 @@ public final class HttpMalformedRequestTestsTrait extends AbstractTrait {
         @Override
         public Trait createTrait(ShapeId target, Node value) {
             ArrayNode values = value.expectArrayNode();
-            List<HttpMalformedRequestTestCase> testCases = values.getElementsAs(HttpMalformedRequestTestCase::fromNode);
+            List<ParameterizedHttpMalformedRequestTestCase> testCases =
+                    values.getElementsAs(ParameterizedHttpMalformedRequestTestCase::fromNode);
             return new HttpMalformedRequestTestsTrait(value.getSourceLocation(), testCases);
         }
     }
 
     public List<HttpMalformedRequestTestCase> getTestCases() {
+        return testCases
+                .stream()
+                .map(ParameterizedHttpMalformedRequestTestCase::generateTestCasesFromParameters)
+                .flatMap(List::stream)
+                .collect(ListUtils.toUnmodifiableList());
+    }
+
+    /**
+     * This is not preferred for code generation. Use {@link #getTestCases()} instead.
+     * @return the parameterized test cases, as defined by the model author
+     */
+    List<ParameterizedHttpMalformedRequestTestCase> getParameterizedTestCases() {
         return testCases;
     }
 
     @Override
     protected Node createNode() {
-        return getTestCases().stream().collect(ArrayNode.collect(getSourceLocation()));
+        return getParameterizedTestCases().stream().collect(ArrayNode.collect(getSourceLocation()));
     }
 }

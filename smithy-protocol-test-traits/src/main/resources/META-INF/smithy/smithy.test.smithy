@@ -322,6 +322,9 @@ structure HttpMalformedRequestTestCase {
 
     /// Applies a list of tags to the test.
     tags: NonEmptyStringList,
+
+    /// An optional set of test parameters for parameterized testing.
+    testParameters: HttpMalformedRequestTestParametersDefinition,
 }
 
 @private
@@ -378,6 +381,7 @@ structure HttpMalformedResponseDefinition {
     body: HttpMalformedResponseBodyDefinition,
 }
 
+@private
 structure HttpMalformedResponseBodyDefinition {
     /// The assertion to execute against the response body.
     @required
@@ -391,6 +395,7 @@ structure HttpMalformedResponseBodyDefinition {
     mediaType: String
 }
 
+@private
 union HttpMalformedResponseBodyAssertion {
     /// Defines the expected serialized response body, which will be matched
     /// exactly.
@@ -400,4 +405,10 @@ union HttpMalformedResponseBodyAssertion {
     /// responses that may have some variance from platform to platform,
     /// such as those that include messages from a parser.
     messageRegex: String
+}
+
+@private
+map HttpMalformedRequestTestParametersDefinition {
+    key: String,
+    value: StringList
 }

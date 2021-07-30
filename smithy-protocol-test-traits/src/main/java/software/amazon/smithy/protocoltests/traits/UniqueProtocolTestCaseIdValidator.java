@@ -50,6 +50,8 @@ public class UniqueProtocolTestCaseIdValidator extends AbstractValidator {
                     .ifPresent(trait -> addTestCaseIdsToMap(shape, trait.getTestCases(), requestIdsToTraits));
             shape.getTrait(HttpResponseTestsTrait.class)
                     .ifPresent(trait -> addTestCaseIdsToMap(shape, trait.getTestCases(), responseIdsToTraits));
+            // This deliberately uses the expanded, instead of parameterized test cases,
+            // in case someone does something wild with naming, like add _case0 to the end of the id
             shape.getTrait(HttpMalformedRequestTestsTrait.class)
                     .ifPresent(t -> addMalformedRequestTestCaseIdsToMap(shape, t.getTestCases(), responseIdsToTraits));
         });
