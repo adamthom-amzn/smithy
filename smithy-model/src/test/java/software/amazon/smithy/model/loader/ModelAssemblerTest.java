@@ -49,6 +49,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 import software.amazon.smithy.model.Model;
 import software.amazon.smithy.model.SourceLocation;
 import software.amazon.smithy.model.node.Node;
@@ -1135,5 +1136,24 @@ public class ModelAssemblerTest {
         // These members are considered boxed in 1.0.
         assertThat(fooBam.getAllTraits(), hasKey(BoxTrait.ID));
         assertThat(fooBam.expectTrait(DefaultTrait.class).toNode(), equalTo(Node.nullNode()));
+    }
+
+    @Test
+    public void defaultValueSugaringDoesNotEatSubsequentDocumentation() {
+        ValidatedResult<Model> result = new ModelAssembler()
+                .addImport(getClass().getResource("missing-documentation.smithy"))
+                .assemble();
+
+        assertThat(result.getValidationEvents(), empty());
+
+        StructureShape testShape =
+                result.unwrap().expectShape(ShapeId.from("software.amazon.smithy.test#TestShape"),
+                        StructureShape.class);
+
+        MemberShape documentedString = testShape.getMember("bar")
+                .orElseThrow(AssertionFailedError::new);
+
+        assertEquals("bar", documentedString.expectTrait(DocumentationTrait.class).getValue());
+        assertEquals(2, documentedString.getAllTraits().size());
     }
 }
